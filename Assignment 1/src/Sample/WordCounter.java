@@ -50,29 +50,19 @@ public class WordCounter {
 
 
     private void countWord(String word, File file) {
-        boolean doesThisFileExist = true;
         String fileName = file.getAbsolutePath();
         if(namesOfFile.isEmpty()){
             namesOfFile.add(fileName);
             System.out.println("Just added " + fileName);
         }
-        else {
-            // iterate through the entire list of file names and check if it contains this file
-            for(int k = 0; k < namesOfFile.size() && doesThisFileExist == true; k++){
-                if(!fileName.equalsIgnoreCase(namesOfFile.get(k))){
-                    doesThisFileExist = false;
-                }
-            }
-        }
-
-        if(doesThisFileExist == false && !namesOfFile.contains(fileName)) { // this was the issue, you had to make sure
+        if(!namesOfFile.contains(fileName)) { // this was the issue, you had to make sure
                                                 // that not only if the file does not exit for a different word, but it must
                                                 // also consider the fact that the arraylist containing the files must not
                                                 // overlap.
             namesOfFile.add(fileName);
             System.out.println("Just added " + fileName);
         }
-        if (wordCounts.containsKey(word) && doesThisFileExist == false) {
+        if (wordCounts.containsKey(word) && !namesOfFile.contains(fileName)) {
             int oldCount = trainHamFreq.get(word);
             trainHamFreq.put(word,oldCount+1);
         }
