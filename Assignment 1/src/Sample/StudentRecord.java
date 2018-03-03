@@ -54,8 +54,6 @@ public class StudentRecord {
     public void setExam(float exam) {
         this.exam = exam;
     }
-    //public void setFinalGrade() {this.}} // work on this after understanding what the extra challenge is asking for...
-    //public void setLetterGrade() // work on this after same reason above ^^ ...
     public float calculateFinalGrade() {
         return ((this.assignment * 0.20f) + (this.midterm * 0.30f) + (this.exam * 0.50f));
     }

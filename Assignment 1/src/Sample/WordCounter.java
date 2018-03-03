@@ -16,7 +16,7 @@ public class WordCounter {
         namesOfFile = new ArrayList<>();
     }
 
-    private void processFile(File file) throws IOException {
+    public void processFile(File file) throws IOException {
         if (file.isDirectory()) {   // if given file path is a directory
 
             // process all the files in that directory
@@ -99,26 +99,6 @@ public class WordCounter {
         //for(int k = 0; k < namesOfFile.size(); k++){
         //    System.out.println(namesOfFile.get(k));
         //}
-    }
-
-    public static void main(String[] args) {
-        if (args.length < 1) {
-            System.err.println("Usage: java WordCounter <dir> <outfile>");
-            System.exit(0);
-        }
-        WordCounter wordCounter = new WordCounter();
-        String path = args[0];
-        File dataDir = new File(path);
-        try {
-            wordCounter.processFile(dataDir);
-            wordCounter.outputWordCounts();
-        } catch (FileNotFoundException e) {
-            System.err.println("Invalid input dir: " + dataDir.getAbsolutePath());
-            e.printStackTrace();
-        } catch (IOException e) {
-            System.out.println("hello");
-            e.printStackTrace();
-        }
     }
 }
 
