@@ -24,6 +24,36 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception{
+        WordCounter wordCounter = new WordCounter();
+        String path = "src\\Sample\\testFiles";
+        System.out.println(path);
+        File dataDir = new File(path);
+        String[] fileList = dataDir.list();
+        try {
+            wordCounter.processFile(dataDir,fileList);
+            //wordCounter.outputWordCounts();
+        } catch (FileNotFoundException e) {
+            System.err.println("Invalid input dir: " + dataDir.getAbsolutePath());
+            e.printStackTrace();
+        } catch (IOException e) {
+            System.out.println("hello");
+            e.printStackTrace();
+        }
+        path = "src\\Sample\\ham";
+        System.out.println(path);
+        dataDir = new File(path);
+        fileList = dataDir.list();
+        try {
+            wordCounter.processFile(dataDir, fileList);
+            //wordCounter.outputWordCounts();
+        } catch (FileNotFoundException e) {
+            System.err.println("Invalid input dir: " + dataDir.getAbsolutePath());
+            e.printStackTrace();
+        } catch (IOException e) {
+            System.out.println("hello");
+            e.printStackTrace();
+        }
+        
         primaryStage.setTitle("Spam Master 3000");
 
         // creating File Menu
@@ -57,7 +87,7 @@ public class Main extends Application {
 
         // Creating table
         table = new TableView<>();
-        table.setItems(DataSource.getAllStudents());
+        table.setItems(DataSource.getAllStudents(wordCounter));
         table.setEditable(true);            // check with false after
 
         // Creating table columns
@@ -69,7 +99,7 @@ public class Main extends Application {
         fileNameCol.setCellFactory(TextFieldTableCell.<FileStats>forTableColumn());
         fileNameCol.setOnEditCommit((TableColumn.CellEditEvent<FileStats, String> event) -> {
             ((FileStats)event.getTableView().getItems().get(event.getTablePosition().getRow())).
-                    setSid(event.getNewValue());
+                    setFileName(event.getNewValue());
         });
 
         TableColumn<FileStats, Float> actualNameCol;
@@ -128,35 +158,6 @@ public class Main extends Application {
     }
 
     public static void main(String[] args) {
-        WordCounter wordCounter = new WordCounter();
-        String path = "src\\Sample\\testFiles";
-        System.out.println(path);
-        File dataDir = new File(path);
-        String[] fileList = dataDir.list();
-        try {
-            wordCounter.processFile(dataDir,fileList);
-            wordCounter.outputWordCounts();
-        } catch (FileNotFoundException e) {
-            System.err.println("Invalid input dir: " + dataDir.getAbsolutePath());
-            e.printStackTrace();
-        } catch (IOException e) {
-            System.out.println("hello");
-            e.printStackTrace();
-        }
-        path = "src\\Sample\\ham";
-        System.out.println(path);
-        dataDir = new File(path);
-        fileList = dataDir.list();
-        try {
-            wordCounter.processFile(dataDir, fileList);
-            wordCounter.outputWordCounts();
-        } catch (FileNotFoundException e) {
-            System.err.println("Invalid input dir: " + dataDir.getAbsolutePath());
-            e.printStackTrace();
-        } catch (IOException e) {
-            System.out.println("hello");
-            e.printStackTrace();
-        }
         launch(args);
     }
 }

@@ -8,8 +8,8 @@ public class WordCounter {
     private List<String> wordKeys;
     private Map<String,Integer> trainHamFreq;
     private Map<String,Integer> trainSpamFreq;
-    private String[] namesOfHamFile;
-    private String[] namesOfSpamFile;
+    String[] namesOfHamFile;
+    String[] namesOfSpamFile;
     private List<String> currentFile = new ArrayList<>();
     private String hamOrSpam;
     // Constructor
