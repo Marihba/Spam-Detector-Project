@@ -1,6 +1,7 @@
 package Sample;
 import java.io.*;
 import java.util.*;
+import java.lang.Math;
 
 public class WordCounter {
     // Private data fields
@@ -8,8 +9,11 @@ public class WordCounter {
     private List<String> wordKeys;
     private Map<String,Integer> trainHamFreq;
     private Map<String,Integer> trainSpamFreq;
-    String[] namesOfHamFile;
-    String[] namesOfSpamFile;
+    Map<String,Double> probabilityWordSpam;
+    Map<String,Double> probabilityWordHam;
+    Map<String,Double> probabilityWordTotal;
+    String[] namesOfHamFileTrain;
+    String[] namesOfSpamFileTrain;
     private List<String> currentFile = new ArrayList<>();
     private String hamOrSpam;
     // Constructor
@@ -17,14 +21,51 @@ public class WordCounter {
         wordCounts = new TreeMap<>();
         trainHamFreq = new TreeMap<>();
         trainSpamFreq = new TreeMap<>();
+        probabilityWordHam = new TreeMap<>();
+        probabilityWordSpam = new TreeMap<>();
+        probabilityWordTotal = new TreeMap<>();
     }
-
+    
+    public void probabilityCalc(){
+        double spamProb;
+        wordKeys = new ArrayList<>(trainHamFreq.keySet());
+        for (String key: wordKeys){
+            spamProb = trainHamFreq.get(key)/namesOfHamFileTrain.length;
+            probabilityWordHam.put(key, spamProb);
+        }
+        wordKeys = new ArrayList<>(trainSpamFreq.keySet());
+        for (String key: wordKeys){
+            spamProb = trainSpamFreq.get(key)/namesOfSpamFileTrain.length;
+            probabilityWordSpam.put(key, spamProb);
+        }
+        wordKeys.addAll(trainHamFreq.keySet());
+        for(String key: wordKeys){
+            if(probabilityWordHam.containsKey(key) && probabilityWordSpam.containsKey(key)){
+                spamProb = trainSpamFreq.get(key)/(trainSpamFreq.get(key)+trainHamFreq.get(key));  
+                probabilityWordTotal.put(key,spamProb);
+            }else if(!probabilityWordHam.containsKey(key) && probabilityWordSpam.containsKey(key)){
+                probabilityWordTotal.put(key, 1.0);
+            }else if(probabilityWordHam.containsKey(key) && !probabilityWordSpam.containsKey(key)){
+                probabilityWordTotal.put(key, 0.0);
+            }
+        }
+        wordKeys = new ArrayList<>(probabilityWordTotal.keySet());
+        /*for(String key: wordKeys){
+            System.out.println(key + ":" + probabilityWordTotal.get(key));
+        }*/
+        double probVarSum = 0.0;
+        for(String key: wordKeys){
+            probVarSum = probVarSum + Math.log(1-probabilityWordTotal.get(key))-Math.log(probabilityWordTotal.get(key));
+            
+        }
+    }
+    
     public void processFile(File file, String[] fileList) throws IOException {
         hamOrSpam = file.getAbsolutePath();
             if(hamOrSpam.contains("ham")){
-                namesOfHamFile = fileList;
+                namesOfHamFileTrain = fileList;
             }else{
-                namesOfSpamFile = fileList;
+                namesOfSpamFileTrain = fileList;
             }
         if (file.isDirectory()) {   // if given file path is a directory
 
@@ -71,7 +112,7 @@ public class WordCounter {
             if(!currentFile.contains(word)){
                 currentFile.add(word);
             }
-        }else{
+        }else if(fileName.contains("spam")){
             if (trainSpamFreq.containsKey(word) && !currentFile.contains(word)) {
                 int oldCount = trainSpamFreq.get(word);
                 trainSpamFreq.put(word,oldCount+1);
@@ -92,14 +133,14 @@ public class WordCounter {
             for (String key: wordKeys){
                 System.out.println(key + ": " + trainHamFreq.get(key));
             }
-            System.out.println("Total number of files:" + namesOfHamFile.length);
-        }else{
+            System.out.println("Total number of files:" + namesOfHamFileTrain.length);
+        }else if (hamOrSpam.contains("testFile")){
             System.out.println("# of words: " + trainSpamFreq.keySet().size());
             wordKeys = new ArrayList<>(trainSpamFreq.keySet());
             for (String key: wordKeys){
                 System.out.println(key + ": " + trainSpamFreq.get(key));
             }
-            System.out.println("Total number of files:" + namesOfSpamFile.length);
+            System.out.println("Total number of files:" + namesOfSpamFileTrain.length);
         }
         //print out file names
         //for(int k = 0; k < namesOfFile.size(); k++){

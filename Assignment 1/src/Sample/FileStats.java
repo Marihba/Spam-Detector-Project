@@ -1,4 +1,5 @@
 package Sample;
+import java.text.DecimalFormat;
 public class FileStats {
 
     private String fileName, fileType;
@@ -19,15 +20,16 @@ public class FileStats {
         return this.fileType;
     }
 
-    public double getSpamProbability() {
-        return this.spamProbability;
+    public String getSpamProbability() {
+        DecimalFormat df = new DecimalFormat("0.00000");
+        return df.format(this.spamProbability);
     }
 
     public void setFileName(String fileName) {
         this.fileName = fileName;
     }
 
-    public void setAssignment(String fileType) {
+    public void setFileType(String fileType) {
         this.fileType = fileType;
     }
 

@@ -25,7 +25,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception{
         WordCounter wordCounter = new WordCounter();
-        String path = "src\\Sample\\testFiles";
+        String path = "src\\Sample\\train\\ham";
         System.out.println(path);
         File dataDir = new File(path);
         String[] fileList = dataDir.list();
@@ -36,10 +36,9 @@ public class Main extends Application {
             System.err.println("Invalid input dir: " + dataDir.getAbsolutePath());
             e.printStackTrace();
         } catch (IOException e) {
-            System.out.println("hello");
             e.printStackTrace();
         }
-        path = "src\\Sample\\ham";
+        path = "src\\Sample\\train\\spam";
         System.out.println(path);
         dataDir = new File(path);
         fileList = dataDir.list();
@@ -50,12 +49,10 @@ public class Main extends Application {
             System.err.println("Invalid input dir: " + dataDir.getAbsolutePath());
             e.printStackTrace();
         } catch (IOException e) {
-            System.out.println("hello");
             e.printStackTrace();
         }
-        
+        wordCounter.probabilityCalc();
         primaryStage.setTitle("Spam Master 3000");
-
         // creating File Menu
         Menu fileMenu = new Menu("File");
         MenuItem newMenuItem = new Menu("New SpamFilter");
@@ -87,39 +84,31 @@ public class Main extends Application {
 
         // Creating table
         table = new TableView<>();
-        table.setItems(DataSource.getAllStudents(wordCounter));
-        table.setEditable(true);            // check with false after
+             // check with false after
 
         // Creating table columns
         TableColumn<FileStats, String> fileNameCol;
         fileNameCol = new TableColumn<>("File");
-        fileNameCol.setStyle("-fx-Alignment: Center");
         fileNameCol.setMinWidth(300);
-        fileNameCol.setCellValueFactory(new PropertyValueFactory<>("File"));
+        fileNameCol.setCellValueFactory(new PropertyValueFactory<>("FileName"));
         fileNameCol.setCellFactory(TextFieldTableCell.<FileStats>forTableColumn());
-        fileNameCol.setOnEditCommit((TableColumn.CellEditEvent<FileStats, String> event) -> {
-            ((FileStats)event.getTableView().getItems().get(event.getTablePosition().getRow())).
-                    setFileName(event.getNewValue());
-        });
-
+      
         TableColumn<FileStats, Float> actualNameCol;
         actualNameCol = new TableColumn<>("Actual Class");
-        actualNameCol.setStyle("-fx-Alignment: Center");
         actualNameCol.setMinWidth(100);
-        actualNameCol.setCellValueFactory(new PropertyValueFactory<>("Actual Class"));
-
+        actualNameCol.setCellValueFactory(new PropertyValueFactory<>("FileType"));
+      
         TableColumn<FileStats, Float> spamNameCol;
         spamNameCol = new TableColumn<>("Spam Probability");
-        spamNameCol.setStyle("-fx-Alignment: Center");
         spamNameCol.setMinWidth(280);
-        spamNameCol.setCellValueFactory(new PropertyValueFactory<>("Spam Probability"));
-
+        spamNameCol.setCellValueFactory(new PropertyValueFactory<>("SpamProbability"));
+      
         // fill in the table
         table.getColumns().add(fileNameCol);
         table.getColumns().add(actualNameCol);
         table.getColumns().add(spamNameCol);
-
-
+        table.setItems(DataSource.getAllStudents(wordCounter));   
+        
         // Extra challenge: Including Add button
         GridPane addArea = new GridPane();  // what is the difference between grid and border pane?
         addArea.setPadding(new Insets(10, 10, 10, 10));
@@ -127,7 +116,6 @@ public class Main extends Application {
         addArea.setHgap(10);
 
         // Creating Labels and TextFields for each piece of info
-
         Label accuracyLabel = new Label("Accuracy: ");
         //sidLabel.setStyle("-fx-Alignment: Center");
         addArea.add(accuracyLabel, 0, 0);
