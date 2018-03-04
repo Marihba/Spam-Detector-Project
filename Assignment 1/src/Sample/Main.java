@@ -9,17 +9,17 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
-
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class Main extends Application {
 
     // instances
-    private TableView<StudentRecord> table;
+    private TableView<FileStats> table;
     private BorderPane layout;
 
     @Override
@@ -46,7 +46,7 @@ public class Main extends Application {
         Menu statsMenu = new Menu("Statistics");
         //MenuItem newMenuItem = new Menu("Pie-Graph");
         statsMenu.getItems().add(new MenuItem("Pie-Graph"));
-        statsMenu.getItems().add(newMenuItem);
+        //statsMenu.getItems().add(newMenuItem);
         statsMenu.getItems().add(new SeparatorMenuItem());
         statsMenu.getItems().add(new MenuItem("Bar-Graph"));
 
@@ -55,35 +55,30 @@ public class Main extends Application {
         menuBar.getMenus().add(fileMenu);
         menuBar.getMenus().add(statsMenu);
 
-
-
-
-
-
         // Creating table
         table = new TableView<>();
         table.setItems(DataSource.getAllStudents());
         table.setEditable(true);            // check with false after
 
         // Creating table columns
-        TableColumn<StudentRecord, String> fileNameCol;
+        TableColumn<FileStats, String> fileNameCol;
         fileNameCol = new TableColumn<>("File");
         fileNameCol.setStyle("-fx-Alignment: Center");
         fileNameCol.setMinWidth(300);
         fileNameCol.setCellValueFactory(new PropertyValueFactory<>("File"));
-        fileNameCol.setCellFactory(TextFieldTableCell.<StudentRecord>forTableColumn());
-        fileNameCol.setOnEditCommit((TableColumn.CellEditEvent<StudentRecord, String> event) -> {
-            ((StudentRecord)event.getTableView().getItems().get(event.getTablePosition().getRow())).
+        fileNameCol.setCellFactory(TextFieldTableCell.<FileStats>forTableColumn());
+        fileNameCol.setOnEditCommit((TableColumn.CellEditEvent<FileStats, String> event) -> {
+            ((FileStats)event.getTableView().getItems().get(event.getTablePosition().getRow())).
                     setSid(event.getNewValue());
         });
 
-        TableColumn<StudentRecord, Float> actualNameCol;
+        TableColumn<FileStats, Float> actualNameCol;
         actualNameCol = new TableColumn<>("Actual Class");
         actualNameCol.setStyle("-fx-Alignment: Center");
         actualNameCol.setMinWidth(100);
         actualNameCol.setCellValueFactory(new PropertyValueFactory<>("Actual Class"));
 
-        TableColumn<StudentRecord, Float> spamNameCol;
+        TableColumn<FileStats, Float> spamNameCol;
         spamNameCol = new TableColumn<>("Spam Probability");
         spamNameCol.setStyle("-fx-Alignment: Center");
         spamNameCol.setMinWidth(280);
@@ -132,19 +127,28 @@ public class Main extends Application {
         primaryStage.show();
     }
 
-
-
     public static void main(String[] args) {
-
-        if (args.length < 1) {
-            System.err.println("Usage: java WordCounter <dir> <outfile>");
-            System.exit(0);
-        }
         WordCounter wordCounter = new WordCounter();
-        String path = args[0];
+        String path = "src\\Sample\\testFiles";
+        System.out.println(path);
         File dataDir = new File(path);
+        String[] fileList = dataDir.list();
         try {
-            wordCounter.processFile(dataDir);
+            wordCounter.processFile(dataDir,fileList);
+            wordCounter.outputWordCounts();
+        } catch (FileNotFoundException e) {
+            System.err.println("Invalid input dir: " + dataDir.getAbsolutePath());
+            e.printStackTrace();
+        } catch (IOException e) {
+            System.out.println("hello");
+            e.printStackTrace();
+        }
+        path = "src\\Sample\\ham";
+        System.out.println(path);
+        dataDir = new File(path);
+        fileList = dataDir.list();
+        try {
+            wordCounter.processFile(dataDir, fileList);
             wordCounter.outputWordCounts();
         } catch (FileNotFoundException e) {
             System.err.println("Invalid input dir: " + dataDir.getAbsolutePath());

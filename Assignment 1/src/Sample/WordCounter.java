@@ -7,22 +7,31 @@ public class WordCounter {
     private Map<String,Integer> wordCounts;
     private List<String> wordKeys;
     private Map<String,Integer> trainHamFreq;
-    private List<String> namesOfFile;
-
+    private Map<String,Integer> trainSpamFreq;
+    private String[] namesOfHamFile;
+    private String[] namesOfSpamFile;
+    private List<String> currentFile = new ArrayList<>();
+    private String hamOrSpam;
     // Constructor
     public WordCounter() {
         wordCounts = new TreeMap<>();
         trainHamFreq = new TreeMap<>();
-        namesOfFile = new ArrayList<>();
+        trainSpamFreq = new TreeMap<>();
     }
 
-    public void processFile(File file) throws IOException {
+    public void processFile(File file, String[] fileList) throws IOException {
+        hamOrSpam = file.getAbsolutePath();
+            if(hamOrSpam.contains("ham")){
+                namesOfHamFile = fileList;
+            }else{
+                namesOfSpamFile = fileList;
+            }
         if (file.isDirectory()) {   // if given file path is a directory
 
             // process all the files in that directory
             File[] contents = file.listFiles();
             for (File current: contents) {
-                processFile(current);
+                processFile(current, fileList);
             }
         }
         else if (file.exists()) {
@@ -35,6 +44,7 @@ public class WordCounter {
                     countWord(word, file);
                 }
             }
+            currentFile.clear();
         }
     }
 
@@ -48,43 +58,49 @@ public class WordCounter {
         }
     }
 
-
     private void countWord(String word, File file) {
         String fileName = file.getAbsolutePath();
-        if(namesOfFile.isEmpty()){
-            namesOfFile.add(fileName);
-            System.out.println("Just added " + fileName);
-        }
-        if(!namesOfFile.contains(fileName)) { // this was the issue, you had to make sure
-                                                // that not only if the file does not exit for a different word, but it must
-                                                // also consider the fact that the arraylist containing the files must not
-                                                // overlap.
-            namesOfFile.add(fileName);
-            System.out.println("Just added " + fileName);
-        }
-        if (wordCounts.containsKey(word) && !namesOfFile.contains(fileName)) {
-            int oldCount = trainHamFreq.get(word);
-            trainHamFreq.put(word,oldCount+1);
-        }
-        else {
-            trainHamFreq.put(word,1);
-        }
-        if (wordCounts.containsKey(word)) {
-            int oldCount = wordCounts.get(word);
-            wordCounts.put(word, oldCount+1);
-        }
-        else {
-            wordCounts.put(word, 1);
+        if(fileName.contains("ham")){
+             if (trainHamFreq.containsKey(word) && !currentFile.contains(word)) {
+                int oldCount = trainHamFreq.get(word);
+                trainHamFreq.put(word,oldCount+1);
+            }
+            else if (!trainHamFreq.containsKey(word)){
+                trainHamFreq.put(word,1);
+            }
+            if(!currentFile.contains(word)){
+                currentFile.add(word);
+            }
+        }else{
+            if (trainSpamFreq.containsKey(word) && !currentFile.contains(word)) {
+                int oldCount = trainSpamFreq.get(word);
+                trainSpamFreq.put(word,oldCount+1);
+            }
+            else if (!trainSpamFreq.containsKey(word)){
+                trainSpamFreq.put(word,1);
+            }
+            if(!currentFile.contains(word)){
+                currentFile.add(word);
+            }
         }
     }
   
     public void outputWordCounts(){
-        System.out.println("# of words: " + wordCounts.keySet().size());
-        wordKeys = new ArrayList<>(trainHamFreq.keySet());
-        for (String key: wordKeys){
-            System.out.println(key + ": " + trainHamFreq.get(key));
+        if(hamOrSpam.contains("ham")){
+            System.out.println("# of words: " + trainHamFreq.keySet().size());
+            wordKeys = new ArrayList<>(trainHamFreq.keySet());
+            for (String key: wordKeys){
+                System.out.println(key + ": " + trainHamFreq.get(key));
+            }
+            System.out.println("Total number of files:" + namesOfHamFile.length);
+        }else{
+            System.out.println("# of words: " + trainSpamFreq.keySet().size());
+            wordKeys = new ArrayList<>(trainSpamFreq.keySet());
+            for (String key: wordKeys){
+                System.out.println(key + ": " + trainSpamFreq.get(key));
+            }
+            System.out.println("Total number of files:" + namesOfSpamFile.length);
         }
-        System.out.println("Total number of files:" + namesOfFile.size());
         //print out file names
         //for(int k = 0; k < namesOfFile.size(); k++){
         //    System.out.println(namesOfFile.get(k));
