@@ -1,6 +1,8 @@
 //Adam Bozzo Abhiram Sinnarajah Assignment 1 Main File
 package Sample;
 import javafx.application.Application;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -54,10 +56,7 @@ public class Main extends Application {
         accuracy = (double)(truePositive + trueNegative)/wordKeys2.size();
         precision = (double)(truePositive)/(falsePositive + truePositive);
     }
-    
-    public void barGraph(Stage primaryStage) throws Exception{
-        
-    }
+
     @Override
     public void start(Stage primaryStage) throws Exception{
         WordCounter wordCounter = new WordCounter();
@@ -129,7 +128,11 @@ public class Main extends Application {
 
         // creating statistics Menu
         Menu statsMenu = new Menu("Statistics");
-        statsMenu.getItems().add(new MenuItem("Bar-Graph"));
+        MenuItem barGraphMenuItem = new MenuItem("Bar-Graph");
+        statsMenu.getItems().add(barGraphMenuItem);
+        barGraphMenuItem.setAccelerator(KeyCombination.keyCombination("Ctrl+G"));
+
+
 
         // setting up Menu Tabs at correct positions (first to last).
         MenuBar menuBar = new MenuBar();
@@ -162,13 +165,13 @@ public class Main extends Application {
         table.getColumns().add(spamNameCol);
         table.setItems(DataSource.getAllFiles(wordCounter));   
         
-        // Extra challenge: Including Add button
+        // Including Add are for accuraccy and precision
         GridPane addArea = new GridPane();  // what is the difference between grid and border pane?
         addArea.setPadding(new Insets(10, 10, 10, 10));
         addArea.setVgap(10);
         addArea.setHgap(10);
 
-        // Creating Labels and TextFields for each piece of info
+        // Creating Labels and TextField for accuracy
         Label accuracyLabel = new Label("Accuracy: ");
         //sidLabel.setStyle("-fx-Alignment: Center");
         addArea.add(accuracyLabel, 0, 0);
@@ -177,6 +180,7 @@ public class Main extends Application {
         accuracyField.setText(String.valueOf(accuracy));
         addArea.add(accuracyField, 1, 0);
 
+        // Creating Label and TextFields for precision
         Label precisionLabel = new Label("Precision: ");
         addArea.add(precisionLabel, 0,2);
 
@@ -184,15 +188,115 @@ public class Main extends Application {
         precisionField.setText(String.valueOf(precision));
         addArea.add(precisionField, 1 ,2);
 
+        // graphs
+        Group root = new Group();
+        Canvas canvas = new Canvas(400,400);
+        root.getChildren().add(canvas);
+
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+
+        // creating legend
+        gc.setFill(Color.BLACK);
+        gc.fillText("Legend",225,113);
+
+        // legend universe
+        gc.setStroke(Color.BLACK);
+        gc.strokeRect(220,118,98,70);
+
+        // true positive in legend
+        gc.fillText("True Positive", 225, 135);
+        gc.setFill(Color.YELLOW);
+        gc.fillRect(305,125,10,10);
+
+        // false positive in legend
+        gc.setFill(Color.BLACK);
+        gc.fillText("False Positive", 225, 150);
+        gc.setFill(Color.RED);
+        gc.fillRect(305,140,10,10);
+
+        // true negative in legend
+        gc.setFill(Color.BLACK);
+        gc.fillText("True Negative", 225, 165);
+        gc.setFill(Color.GREEN);
+        gc.fillRect(305, 155, 10, 10);
+
+        // false negative in legend
+        gc.setFill(Color.BLACK);
+        gc.fillText("False Negative", 225, 180);
+        gc.setFill(Color.BLUE);
+        gc.fillRect(305, 170, 10, 10);
+
+        // Bar graph Universe
+        gc.setStroke(Color.BLACK);
+        gc.strokeRect(25, 100, 300, 250);
+
+
+        // setting up axis for graph
+        gc.setStroke(Color.BLACK);
+        // x-axis
+        gc.strokeLine(85, 300, 220, 300);
+        // y-axis
+        gc.strokeLine(85, 155, 85,  300);
+        // ticks on the y axis (# of files...)
+        gc.setFill(Color.BLACK);
+        gc.fillText("200", 59, 287);
+        gc.fillText("400", 59, 267);
+        gc.fillText("600", 59, 247);
+        gc.fillText("800", 59, 227);
+        gc.fillText("1000", 53, 207);
+        gc.fillText("1200", 53, 187);
+        gc.fillText("1400", 53, 167);
+        gc.fillRect(80, 290, 10, 2);
+        gc.fillRect(80, 280, 10, 2);
+        gc.fillRect(80, 270, 10, 2);
+        gc.fillRect(80, 260, 10, 2);
+        gc.fillRect(80, 250, 10, 2);
+        gc.fillRect(80, 240, 10, 2);
+        gc.fillRect(80, 230, 10, 2);
+        gc.fillRect(80, 220, 10, 2);
+        gc.fillRect(80, 210, 10, 2);
+        gc.fillRect(80, 200, 10, 2);
+        gc.fillRect(80, 190, 10, 2);
+        gc.fillRect(80, 180, 10, 2);
+        gc.fillRect(80, 170, 10, 2);
+        gc.fillRect(80, 160, 10, 2);
+
+
+
+        gc.setFill(Color.BLACK);
+        gc.fillText("Positives and Negatives", 91, 315);
+        gc.fillText("# of\nFiles", 30,225);
+
+        // filling graph with data
+
+        // true positive
+        gc.setFill(Color.YELLOW);
+        gc.fillRect(95, 166, 20, 133);
+
+        // false positive
+        gc.setFill(Color.RED);
+        gc.fillRect(125, 276, 20, 23);
+
+        // true negative
+        gc.setFill(Color.GREEN);
+        gc.fillRect(155, 187, 20, 112);
+
+        // false negative
+        gc.setFill(Color.BLUE);
+        gc.fillRect(185, 295, 20, 4);
 
         // setting up stage
         layout = new BorderPane();
         layout.setTop(menuBar);
         layout.setCenter(table);
         layout.setBottom(addArea);
+        layout.setRight(canvas);
 
         //Scene and stage setup
-        Scene scene = new Scene(layout, 685, 600);
+//        Scene scene = new Scene(layout, 685, 600);
+        Scene scene = new Scene(layout, 1200, 900);
+
+
         primaryStage.setTitle("Spam Master 3000");
         primaryStage.setScene(scene);
         primaryStage.show();
