@@ -12,8 +12,13 @@ public class WordCounter {
     Map<String,Double> probabilityWordSpam;
     Map<String,Double> probabilityWordHam;
     Map<String,Double> probabilityWordTotal;
+    Map<String,Double> probabilityFileSpam;
     String[] namesOfHamFileTrain;
     String[] namesOfSpamFileTrain;
+    String[] namesOfTestFile;
+    String[] namesOfHamFileTest;
+    String[] namesOfSpamFileTest;
+    
     private List<String> currentFile = new ArrayList<>();
     private String hamOrSpam;
     // Constructor
@@ -24,24 +29,25 @@ public class WordCounter {
         probabilityWordHam = new TreeMap<>();
         probabilityWordSpam = new TreeMap<>();
         probabilityWordTotal = new TreeMap<>();
+        probabilityFileSpam = new TreeMap<>();
     }
     
     public void probabilityCalc(){
         double spamProb;
         wordKeys = new ArrayList<>(trainHamFreq.keySet());
         for (String key: wordKeys){
-            spamProb = trainHamFreq.get(key)/namesOfHamFileTrain.length;
+            spamProb = (double)trainHamFreq.get(key)/namesOfHamFileTrain.length;
             probabilityWordHam.put(key, spamProb);
         }
         wordKeys = new ArrayList<>(trainSpamFreq.keySet());
         for (String key: wordKeys){
-            spamProb = trainSpamFreq.get(key)/namesOfSpamFileTrain.length;
+            spamProb = (double)trainSpamFreq.get(key)/namesOfSpamFileTrain.length;
             probabilityWordSpam.put(key, spamProb);
         }
         wordKeys.addAll(trainHamFreq.keySet());
         for(String key: wordKeys){
             if(probabilityWordHam.containsKey(key) && probabilityWordSpam.containsKey(key)){
-                spamProb = trainSpamFreq.get(key)/(trainSpamFreq.get(key)+trainHamFreq.get(key));  
+                spamProb = probabilityWordSpam.get(key)/(probabilityWordSpam.get(key)+probabilityWordHam.get(key));  
                 probabilityWordTotal.put(key,spamProb);
             }else if(!probabilityWordHam.containsKey(key) && probabilityWordSpam.containsKey(key)){
                 probabilityWordTotal.put(key, 1.0);
@@ -50,13 +56,42 @@ public class WordCounter {
             }
         }
         wordKeys = new ArrayList<>(probabilityWordTotal.keySet());
-        /*for(String key: wordKeys){
-            System.out.println(key + ":" + probabilityWordTotal.get(key));
-        }*/
+    }
+    public void processTestFile(File file) throws IOException{
         double probVarSum = 0.0;
-        for(String key: wordKeys){
-            probVarSum = probVarSum + Math.log(1-probabilityWordTotal.get(key))-Math.log(probabilityWordTotal.get(key));
-            
+        double spamChance;
+        List<String> tempWord = new ArrayList<>();
+        if (file.isDirectory()) {   // if given file path is a directory
+            // process all the files in that directory
+            File[] contents = file.listFiles();
+            for (File current: contents) {
+                processTestFile(current);
+            }
+        }
+        else if (file.exists()) {
+            // count the words in this file
+            Scanner scanner = new Scanner(file);
+            scanner.useDelimiter("\\s");
+            while (scanner.hasNext()) {
+                String word = scanner.next();
+                if (isWord(word)) {
+                    if(!tempWord.contains(word)){
+                        tempWord.add(word);
+                    }
+                }
+            }
+
+            for(String key: tempWord){
+                if(probabilityWordTotal.containsKey(key)){
+                    if(probabilityWordTotal.get(key) > 0.0 && probabilityWordTotal.get(key) != -0.0 
+                    && probabilityWordTotal.get(key) < 1.0){
+                        probVarSum += Math.log(1.0-probabilityWordTotal.get(key)) - (Math.log(probabilityWordTotal.get(key)));
+                    }
+                }
+            }
+            tempWord.clear();
+            spamChance = 1.0/(1.0+Math.exp(probVarSum));
+            probabilityFileSpam.put(file.getName(), spamChance);
         }
     }
     

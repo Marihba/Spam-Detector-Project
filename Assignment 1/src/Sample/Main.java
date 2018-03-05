@@ -52,6 +52,34 @@ public class Main extends Application {
             e.printStackTrace();
         }
         wordCounter.probabilityCalc();
+        path = "src\\Sample\\test\\ham";
+        System.out.println(path);
+        dataDir = new File(path);
+        wordCounter.namesOfHamFileTest = dataDir.list();
+        try {
+            wordCounter.processTestFile(dataDir);
+            //wordCounter.outputWordCounts();
+        } catch (FileNotFoundException e) {
+            System.err.println("Invalid input dir: " + dataDir.getAbsolutePath());
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        path = "src\\Sample\\test\\spam";
+        System.out.println(path);
+        dataDir = new File(path);
+        wordCounter.namesOfSpamFileTest = dataDir.list();
+        try {
+            wordCounter.processTestFile(dataDir);
+            //wordCounter.outputWordCounts();
+        } catch (FileNotFoundException e) {
+            System.err.println("Invalid input dir: " + dataDir.getAbsolutePath());
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        
+        
         primaryStage.setTitle("Spam Master 3000");
         // creating File Menu
         Menu fileMenu = new Menu("File");
@@ -107,7 +135,7 @@ public class Main extends Application {
         table.getColumns().add(fileNameCol);
         table.getColumns().add(actualNameCol);
         table.getColumns().add(spamNameCol);
-        table.setItems(DataSource.getAllStudents(wordCounter));   
+        table.setItems(DataSource.getAllFiles(wordCounter));   
         
         // Extra challenge: Including Add button
         GridPane addArea = new GridPane();  // what is the difference between grid and border pane?
