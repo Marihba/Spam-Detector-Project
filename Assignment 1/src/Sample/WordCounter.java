@@ -1,10 +1,12 @@
+//Adam Bozzo Abhiram Sinnarajah Assignment 1 Processing Word File
 package Sample;
 import java.io.*;
 import java.util.*;
 import java.lang.Math;
+import java.util.stream.Stream;
 
 public class WordCounter {
-    // Private data fields
+    //different tree maps being used
     private Map<String,Integer> wordCounts;
     private List<String> wordKeys;
     private Map<String,Integer> trainHamFreq;
@@ -13,15 +15,17 @@ public class WordCounter {
     Map<String,Double> probabilityWordHam;
     Map<String,Double> probabilityWordTotal;
     Map<String,Double> probabilityFileSpam;
+    //arrays containing names of the files
     String[] namesOfHamFileTrain;
     String[] namesOfSpamFileTrain;
     String[] namesOfTestFile;
     String[] namesOfHamFileTest;
     String[] namesOfSpamFileTest;
     
-    private List<String> currentFile = new ArrayList<>();
-    private String hamOrSpam;
-    // Constructor
+    private List<String> currentFile = new ArrayList<>();//list that contains words of current file being worked on
+    private String hamOrSpam;//string that determines if it is ham or spam file
+    
+    // Constructor to initialize object and tree map
     public WordCounter() {
         wordCounts = new TreeMap<>();
         trainHamFreq = new TreeMap<>();
@@ -32,19 +36,24 @@ public class WordCounter {
         probabilityFileSpam = new TreeMap<>();
     }
     
+    //method to calculate probability that the word is spam
     public void probabilityCalc(){
         double spamProb;
+        //determines probability of word being spam from train ham set
         wordKeys = new ArrayList<>(trainHamFreq.keySet());
         for (String key: wordKeys){
             spamProb = (double)trainHamFreq.get(key)/namesOfHamFileTrain.length;
             probabilityWordHam.put(key, spamProb);
         }
+        //determines probability of word being spam from spam train set
         wordKeys = new ArrayList<>(trainSpamFreq.keySet());
         for (String key: wordKeys){
             spamProb = (double)trainSpamFreq.get(key)/namesOfSpamFileTrain.length;
             probabilityWordSpam.put(key, spamProb);
         }
-        wordKeys.addAll(trainHamFreq.keySet());
+        wordKeys.addAll(trainHamFreq.keySet());//combines the two spam probability from ham and spam
+        
+        //loop to generate tree map from training for probability of spam for each word
         for(String key: wordKeys){
             if(probabilityWordHam.containsKey(key) && probabilityWordSpam.containsKey(key)){
                 spamProb = probabilityWordSpam.get(key)/(probabilityWordSpam.get(key)+probabilityWordHam.get(key));  
@@ -57,6 +66,7 @@ public class WordCounter {
         }
         wordKeys = new ArrayList<>(probabilityWordTotal.keySet());
     }
+    //method to process the test files
     public void processTestFile(File file) throws IOException{
         double probVarSum = 0.0;
         double spamChance;
@@ -80,7 +90,7 @@ public class WordCounter {
                     }
                 }
             }
-
+            //calculates the summation variable that will be used in spam chance equation
             for(String key: tempWord){
                 if(probabilityWordTotal.containsKey(key)){
                     if(probabilityWordTotal.get(key) > 0.0 && probabilityWordTotal.get(key) != -0.0 
@@ -89,9 +99,9 @@ public class WordCounter {
                     }
                 }
             }
-            tempWord.clear();
-            spamChance = 1.0/(1.0+Math.exp(probVarSum));
-            probabilityFileSpam.put(file.getName(), spamChance);
+            tempWord.clear();//clears out the list that contains all words in file so it is clean for next file
+            spamChance = 1.0/(1.0+Math.exp(probVarSum));//calculates the spam chance for this file
+            probabilityFileSpam.put(file.getName(), spamChance);//stores spam chance into tree map
         }
     }
     
@@ -169,7 +179,7 @@ public class WordCounter {
                 System.out.println(key + ": " + trainHamFreq.get(key));
             }
             System.out.println("Total number of files:" + namesOfHamFileTrain.length);
-        }else if (hamOrSpam.contains("testFile")){
+        }else if (hamOrSpam.contains("spam")){
             System.out.println("# of words: " + trainSpamFreq.keySet().size());
             wordKeys = new ArrayList<>(trainSpamFreq.keySet());
             for (String key: wordKeys){
