@@ -1,4 +1,4 @@
-//Adam Bozzo Abhiram Sinnarajah Assignment 1 Main File
+//Adam Bozzo Abhiram Sinnarajah Assignment 1 TestFile
 package Sample;
 import java.text.DecimalFormat;
 public class TestFile {
@@ -7,6 +7,7 @@ public class TestFile {
     private String actualClass;
     private double spamProbability;
 
+    //methods to return all the file attributes to datasource and the UI
     public TestFile(String fileName, String fileType, double spamProbability) {
         this.fileName = fileName;
         this.actualClass = fileType;

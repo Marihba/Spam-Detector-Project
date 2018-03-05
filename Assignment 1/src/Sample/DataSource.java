@@ -1,4 +1,4 @@
-//Adam Bozzo Abhiram Sinnarajah Assignment 1 Main File
+//Adam Bozzo Abhiram Sinnarajah Assignment 1 Datasource File
 package Sample;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -6,6 +6,7 @@ import java.util.List;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+//datasource that adds all the values to the columns in the UI
 public class DataSource {
     public static ObservableList<TestFile> getAllFiles(WordCounter wordCounter) {
         ObservableList<TestFile> statistics = FXCollections.observableArrayList();

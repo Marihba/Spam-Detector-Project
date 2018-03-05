@@ -19,7 +19,6 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
-
 public class Main extends Application {
     // instances
     private TableView<TestFile> table;
@@ -131,7 +130,6 @@ public class Main extends Application {
         MenuItem barGraphMenuItem = new MenuItem("Bar-Graph");
         statsMenu.getItems().add(barGraphMenuItem);
         barGraphMenuItem.setAccelerator(KeyCombination.keyCombination("Ctrl+G"));
-
 
 
         // setting up Menu Tabs at correct positions (first to last).
@@ -285,21 +283,38 @@ public class Main extends Application {
         gc.setFill(Color.BLUE);
         gc.fillRect(185, 295, 20, 4);
 
+        gc.setFill(Color.BLACK);
+        gc.fillText("Correct vs Incorrect\n        Predictions", 95, 140);
+
         // setting up stage
         layout = new BorderPane();
         layout.setTop(menuBar);
         layout.setCenter(table);
         layout.setBottom(addArea);
-        layout.setRight(canvas);
-
         //Scene and stage setup
-//        Scene scene = new Scene(layout, 685, 600);
-        Scene scene = new Scene(layout, 1200, 900);
-
-
+        //Scene scene = new Scene(layout, 685, 600);
+        Scene scene = new Scene(layout, 650, 600);
+        
+        //print out primary stage
         primaryStage.setTitle("Spam Master 3000");
         primaryStage.setScene(scene);
         primaryStage.show();
+        
+        //event handler to create popup screen when statistics menu item is pressed
+        barGraphMenuItem.setOnAction(
+        new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                layout = new BorderPane();              
+                final Stage statisticsPop = new Stage();
+                layout.setTop(canvas);
+                Scene statisticsScene = new Scene(layout, 350, 420);
+                statisticsPop.setTitle("Predictions");
+                statisticsPop.setScene(statisticsScene);
+                statisticsPop.show();
+            }
+         });
+    
     }
 
     public static void main(String[] args) {

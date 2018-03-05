@@ -3,7 +3,6 @@ package Sample;
 import java.io.*;
 import java.util.*;
 import java.lang.Math;
-import java.util.stream.Stream;
 
 public class WordCounter {
     //different tree maps being used
@@ -130,10 +129,11 @@ public class WordCounter {
                     countWord(word, file);
                 }
             }
-            currentFile.clear();
+            currentFile.clear();//clears the list that contains all unique wordss from current file
         }
     }
 
+    //method to check if it is a word
     private boolean isWord(String word) {
         String pattern = "^[a-zA-Z]+$";
         if (word.matches(pattern)) {
@@ -146,8 +146,8 @@ public class WordCounter {
 
     private void countWord(String word, File file) {
         String fileName = file.getAbsolutePath();
-        if(fileName.contains("ham")){
-             if (trainHamFreq.containsKey(word) && !currentFile.contains(word)) {
+        if(fileName.contains("ham")){//if statements that add words to the ham tree map with their reoccurence rate
+             if (trainHamFreq.containsKey(word) && !currentFile.contains(word)){
                 int oldCount = trainHamFreq.get(word);
                 trainHamFreq.put(word,oldCount+1);
             }
@@ -157,7 +157,7 @@ public class WordCounter {
             if(!currentFile.contains(word)){
                 currentFile.add(word);
             }
-        }else if(fileName.contains("spam")){
+        }else if(fileName.contains("spam")){//if statements that add words to the spam tree map with their reoccurence rate
             if (trainSpamFreq.containsKey(word) && !currentFile.contains(word)) {
                 int oldCount = trainSpamFreq.get(word);
                 trainSpamFreq.put(word,oldCount+1);
@@ -170,7 +170,8 @@ public class WordCounter {
             }
         }
     }
-  
+    
+    //method that outputs the word counts to check how many times a word reappears in each file
     public void outputWordCounts(){
         if(hamOrSpam.contains("ham")){
             System.out.println("# of words: " + trainHamFreq.keySet().size());
