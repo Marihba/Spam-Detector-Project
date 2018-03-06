@@ -9,3 +9,5 @@ project named Sample on an IDE. Run the main class on the IDE.
 
 Git Hub Link:
 https://github.com/Marihba/SysDev_Assignment1
+
+For our data files we combined the ham and ham2 training folder into one folder called ham.
